@@ -13,7 +13,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 const Home: React.FC = () => {
   const theme = createTheme({ palette: { primary: { main: '#333' } } });
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
