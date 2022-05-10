@@ -1,3 +1,7 @@
+import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDb } from '../dbProvider';
+import { ctxTypes } from '../types';
 import CssBaseline from '@mui/material/CssBaseline';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -18,12 +22,23 @@ const msg = [
 ];
 
 const Room = () => {
+  const navigate = useNavigate();
+  const { messages, sendMsg, user } = useDb() as ctxTypes;
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleSendMsg = () => {
+    console.log(inputRef.current);
+    const msg = inputRef.current?.value.trim();
+    if (!msg) return;
+    sendMsg(msg);
+  };
+
   return (
     <>
       <CssBaseline />
 
       <AppBar sx={{ flexDirection: 'row', py: 1 }}>
-        <Button>
+        <Button onClick={() => navigate(-1)}>
           <KeyboardBackspace sx={{ color: '#fff', fontSize: 30 }} />
         </Button>
         <Box width='100%' sx={{ display: 'flex', gap: 2 }}>
@@ -40,10 +55,11 @@ const Room = () => {
         component='main'
         sx={{ pb: 9, display: 'flex', gap: 2, flexDirection: 'column-reverse', height: '100vh' }}
       >
-        {msg.map((item, i) => (
+        {messages.map((item, i) => (
           <Snackbar
             open={true}
-            sx={{ position: 'static', px: 1, alignSelf: i%2 ? 'flex-start':'flex-end' }}
+            key={item.id}
+            sx={{ position: 'static', px: 1, alignSelf: item.user === user ? 'flex-end' : 'flex-start' }}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             message={item.msg}
           />
@@ -55,11 +71,16 @@ const Room = () => {
         bottom={10}
       >
         <OutlinedInput
+          inputRef={inputRef}
           size='small'
           placeholder='Message'
           sx={{ bgcolor: '#333', color: '#fff', flexGrow: 1 }}
         />
-        <Button variant='contained' sx={{ borderRadius: '5%', width: '2.5rem', height: '2.5rem' }}>
+        <Button
+          onClick={handleSendMsg}
+          variant='contained'
+          sx={{ borderRadius: '5%', width: '2.5rem', height: '2.5rem' }}
+        >
           <SendIcon sx={{ fontSize: 25 }} />
         </Button>
       </Box>
